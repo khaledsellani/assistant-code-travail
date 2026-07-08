@@ -1,0 +1,13 @@
+# Secrets — ne jamais versionner
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Base vectorielle (regénérée au besoin, trop lourde pour Git)
+chroma_db/
+
+# Divers
+.vscode/
