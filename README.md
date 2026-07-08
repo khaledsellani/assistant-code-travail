@@ -32,3 +32,33 @@ chaque réponse de l'assistant afin que l'utilisateur sache que les
 compte. L'avertissement invite à vérifier sur legifrance.gouv.fr pour
 toute disposition récente. Pour mettre à jour le corpus, il suffit de
 télécharger une archive LEGI plus récente et de relancer le pipeline.
+
+
+### Q1 — Granularité du chunking
+
+Un chunk = un article. Les articles du Code du travail sont courts et
+autonomes, c'est la découpe naturelle. Ça donne une recherche précise
+et une citation directe : le chunk trouvé est l'article à citer.
+Regrouper par section garderait plus de contexte, mais les chunks
+seraient longs, la recherche moins précise, et on ne saurait pas quel
+article citer dans le lot.
+
+On ajoute quand même un peu d'hybride : le texte embeddé est préfixé
+du thème et de la section de l'article. Ça redonne du contexte sans
+perdre la précision. Par contre les renvois entre articles ("au sens
+de l'article L. 1234-5") ne sont pas gérés. En pratique le top-k
+ramène souvent les articles voisins ensemble, donc ça limite le
+problème.
+
+
+### Q2 — Traçabilité du numéro d'article
+
+Le numéro est stocké aux deux endroits. En métadonnées pour avoir une
+version fiable qu'on affiche à l'utilisateur. Dans le texte embeddé
+pour qu'une question du genre "que dit L3121-1 ?" puisse matcher.
+
+Pour éviter que le LLM invente des numéros : chaque chunk du prompt
+est présenté comme "[Article L3121-1] texte...", le numéro venant des
+métadonnées, et le prompt interdit de citer un numéro absent du
+contexte. Surtout, le code affiche lui-même la liste des articles
+sources depuis les métadonnées, sans dépendre de ce que le LLM écrit.
