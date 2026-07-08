@@ -62,3 +62,26 @@ est présenté comme "[Article L3121-1] texte...", le numéro venant des
 métadonnées, et le prompt interdit de citer un numéro absent du
 contexte. Surtout, le code affiche lui-même la liste des articles
 sources depuis les métadonnées, sans dépendre de ce que le LLM écrit.
+
+
+
+### Q4 — Réponses conditionnelles
+
+Beaucoup de réponses dépendent de la taille de l'entreprise ou de la
+convention collective. En ligne de commande, poser des questions de
+clarification alourdit vite l'échange. On choisit donc la réponse
+générale assortie de réserves : le prompt demande au LLM de signaler
+explicitement quand une règle varie (effectif, convention collective)
+et de donner la règle générale du Code avec ses conditions.
+
+
+### Q5 — Frontière du conseil juridique
+
+Une question d'information ("combien de jours de congés ?") a sa
+réponse dans le Code : on répond en citant. Une question
+d'interprétation ("mon licenciement est-il abusif ?") demande
+d'appliquer le droit à un cas personnel : c'est du conseil juridique.
+Le prompt demande au LLM de donner les règles générales qui
+s'appliquent, sans se prononcer sur le cas de la personne, et de
+renvoyer vers un avocat ou l'inspection du travail. L'avertissement
+juridique est de toute façon ajouté par le code à chaque réponse.
