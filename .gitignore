@@ -11,3 +11,8 @@ chroma_db/
 
 # Divers
 .vscode/
+
+# Données brutes (trop lourdes pour Git)
+data/
+*.tar.gz
+
