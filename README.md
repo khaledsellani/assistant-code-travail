@@ -20,19 +20,23 @@ Pipeline de préparation :
    (numéro, thème, section, date d'entrée en vigueur, source).
 3. `controle_qualite.py` : relecture de 10 articles aléatoires.
 
+Thèmes couverts (7) et répartition :
+
+| Thème | Articles |
+|---|---|
+| Contrat de travail (CDI, CDD) | 232 |
+| Licenciement | 188 |
+| Durée du travail et heures supplémentaires | 70 |
+| Congés payés | 38 |
+| Rupture conventionnelle | 28 |
+| Salaire minimum (SMIC) | 20 |
+| Harcèlement et discrimination | 16 |
+
+Le thème « Représentation du personnel » du sujet n'a pas été retenu :
+les questions portant dessus sont honnêtement refusées par le système
+(hors corpus).
+
 ## Questions de réflexion
-
-### Q3 — Fraîcheur du corpus
-
-Le droit du travail évolue en permanence. Notre corpus est figé à la
-date de l'archive LEGI : le 13 juillet 2025. Cette date est stockée
-dans le champ `source` de chaque document, et sera rappelée dans
-chaque réponse de l'assistant afin que l'utilisateur sache que les
-évolutions postérieures (lois, ordonnances) ne sont pas prises en
-compte. L'avertissement invite à vérifier sur legifrance.gouv.fr pour
-toute disposition récente. Pour mettre à jour le corpus, il suffit de
-télécharger une archive LEGI plus récente et de relancer le pipeline.
-
 
 ### Q1 — Granularité du chunking
 
@@ -50,7 +54,6 @@ de l'article L. 1234-5") ne sont pas gérés. En pratique le top-k
 ramène souvent les articles voisins ensemble, donc ça limite le
 problème.
 
-
 ### Q2 — Traçabilité du numéro d'article
 
 Le numéro est stocké aux deux endroits. En métadonnées pour avoir une
@@ -63,7 +66,16 @@ métadonnées, et le prompt interdit de citer un numéro absent du
 contexte. Surtout, le code affiche lui-même la liste des articles
 sources depuis les métadonnées, sans dépendre de ce que le LLM écrit.
 
+### Q3 — Fraîcheur du corpus
 
+Le droit du travail évolue en permanence. Notre corpus est figé à la
+date de l'archive LEGI : le 13 juillet 2025. Cette date est stockée
+dans le champ `source` de chaque document, et sera rappelée dans
+chaque réponse de l'assistant afin que l'utilisateur sache que les
+évolutions postérieures (lois, ordonnances) ne sont pas prises en
+compte. L'avertissement invite à vérifier sur legifrance.gouv.fr pour
+toute disposition récente. Pour mettre à jour le corpus, il suffit de
+télécharger une archive LEGI plus récente et de relancer le pipeline.
 
 ### Q4 — Réponses conditionnelles
 
@@ -73,7 +85,6 @@ clarification alourdit vite l'échange. On choisit donc la réponse
 générale assortie de réserves : le prompt demande au LLM de signaler
 explicitement quand une règle varie (effectif, convention collective)
 et de donner la règle générale du Code avec ses conditions.
-
 
 ### Q5 — Frontière du conseil juridique
 
@@ -85,8 +96,6 @@ Le prompt demande au LLM de donner les règles générales qui
 s'appliquent, sans se prononcer sur le cas de la personne, et de
 renvoyer vers un avocat ou l'inspection du travail. L'avertissement
 juridique est de toute façon ajouté par le code à chaque réponse.
-
-
 
 ## Installation
 
@@ -116,16 +125,16 @@ avec une clé API Groq (gratuite sur console.groq.com).
 python assistant.py
 ```
 
-La base est rechargée depuis le disque sans réindexation.
-Scripts de vérification : `controle_qualite.py` (relecture du corpus),
-`evaluer_retrieval.py` (5 questions de référence, score 5/5).
-
 L'assistant pose une boucle de questions-réponses. Commandes de
 sortie : `quitter`, `exit` ou `q`. Une entrée vide redemande la question.
+La base est rechargée depuis le disque sans réindexation.
 
 Interface web (bonus) : `streamlit run app.py` — mêmes fonctionnalités
 que la CLI (citations, score de confiance, avertissement), via le même
 pipeline (`repondre.py`).
+
+Scripts de vérification : `controle_qualite.py` (relecture du corpus),
+`evaluer_retrieval.py` (5 questions de référence, score 5/5).
 
 ## Amélioration (jalon 6) : score de confiance
 
