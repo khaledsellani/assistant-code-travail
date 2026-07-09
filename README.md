@@ -85,3 +85,37 @@ Le prompt demande au LLM de donner les règles générales qui
 s'appliquent, sans se prononcer sur le cas de la personne, et de
 renvoyer vers un avocat ou l'inspection du travail. L'avertissement
 juridique est de toute façon ajouté par le code à chaque réponse.
+
+
+
+## Installation
+
+```bash
+git clone https://github.com/khaledsellani/assistant-code-travail.git
+cd assistant-code-travail
+python -m venv venv
+venv\Scripts\activate        # Windows (source venv/bin/activate sous Linux/Mac)
+pip install -r requirements.txt
+```
+
+Créer un fichier `.env` à la racine sur le modèle de `.env.example`,
+avec une clé API Groq (gratuite sur console.groq.com).
+
+## Construction de la base (une seule fois)
+
+1. Télécharger l'archive LEGI `Freemium_legi_global_*.tar.gz` depuis
+   echanges.dila.gouv.fr/OPENDATA/LEGI/ et la placer dans `data/`
+   (adapter le nom du fichier dans `extraire_code_travail.py`).
+2. `python extraire_code_travail.py` — extrait le Code du travail
+3. `python preparer_corpus.py` — produit `data/corpus.json`
+4. `python indexer.py` — construit la base vectorielle `chroma_db/`
+
+## Lancement
+
+```bash
+python assistant.py
+```
+
+La base est rechargée depuis le disque sans réindexation.
+Scripts de vérification : `controle_qualite.py` (relecture du corpus),
+`evaluer_retrieval.py` (5 questions de référence, score 5/5).
