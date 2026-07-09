@@ -1,4 +1,4 @@
-"""Interface web Streamlit — réutilise le pipeline de repondre.py."""
+"""Interface web Streamlit en mode chat — réutilise le pipeline de repondre.py."""
 
 import os
 import chromadb
@@ -13,11 +13,9 @@ from repondre import (
 )
 
 load_dotenv()
-SEUIL_CONFIANCE = 18.0   # le même seuil calibré que la CLI
+SEUIL_CONFIANCE = 18.0
 
-
-
-@st.cache_resource
+@st.cache_resource(show_spinner="Chargement du modèle et de la base (première fois uniquement)...")
 def charger_ressources():
     client = chromadb.PersistentClient(path=DOSSIER_BASE)
     collection = client.get_collection(NOM_COLLECTION)
@@ -28,30 +26,63 @@ def charger_ressources():
 
 collection, modele_embedding, client_groq = charger_ressources()
 
-# --- La page ---
-st.title("⚖️ Assistant Code du travail")
-st.caption(f"Base LEGI à jour au {DATE_CORPUS} — RAG sans framework")
+# --- Barre latérale : les infos du projet ---
+with st.sidebar:
+    st.header("⚖️ À propos")
+    st.write(f"**Corpus :** Code du travail, base LEGI du {DATE_CORPUS}")
+    st.write(f"**Articles indexés :** {collection.count()}")
+    st.write("**Thèmes :** durée du travail, congés payés, contrat de travail, "
+             "licenciement, rupture conventionnelle, SMIC, harcèlement")
+    st.write(f"**Seuil de confiance :** {SEUIL_CONFIANCE}")
+    st.divider()
+    st.caption(AVERTISSEMENT)
 
-question = st.text_input("Votre question sur le droit du travail :")
+st.title("⚖️ Assistant Code du travail")
+
+# --- Initialisation de l'historique (première exécution seulement) ---
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# --- Ré-affichage de tout l'historique à chaque exécution ---
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        if "sources" in message:
+            with st.expander("📚 Articles consultés"):
+                st.write(message["sources"])
+
+# --- Saisie utilisateur ---
+question = st.chat_input("Posez votre question sur le droit du travail...")
 
 if question:
-    with st.spinner("Recherche dans le Code du travail..."):
-        resultats = rechercher(collection, modele_embedding, question)
-        meilleure_dist = resultats["distances"][0][0]
+    # 1. Afficher et mémoriser la question
+    with st.chat_message("user"):
+        st.markdown(question)
+    st.session_state.messages.append({"role": "user", "content": question})
 
-        if meilleure_dist > SEUIL_CONFIANCE:
-            st.warning(
-                f"Confiance faible (distance {meilleure_dist:.1f} > seuil "
-                f"{SEUIL_CONFIANCE}) : la question semble éloignée du Code du travail."
-            )
+    # 2. Pipeline RAG (le même que la CLI)
+    with st.chat_message("assistant"):
+        with st.spinner("Recherche dans le Code du travail..."):
+            resultats = rechercher(collection, modele_embedding, question)
+            meilleure_dist = resultats["distances"][0][0]
 
-        contexte = construire_contexte(resultats)
-        reponse = generer(client_groq, contexte, question)
+            if meilleure_dist > SEUIL_CONFIANCE:
+                st.warning(f"Confiance faible (distance {meilleure_dist:.1f} > "
+                           f"seuil {SEUIL_CONFIANCE}) : question éloignée du Code du travail.")
 
-    st.markdown(reponse)
+            contexte = construire_contexte(resultats)
+            reponse = generer(client_groq, contexte, question)
 
-    with st.expander("📚 Articles consultés"):
-        for meta, dist in zip(resultats["metadatas"][0], resultats["distances"][0]):
-            st.write(f"**{meta['numero']}** — {meta['theme']} (distance {dist:.1f})")
+        st.markdown(reponse)
+        sources = ", ".join(
+            f"{meta['numero']} (d={dist:.1f})"
+            for meta, dist in zip(resultats["metadatas"][0], resultats["distances"][0])
+        )
+        with st.expander("📚 Articles consultés"):
+            st.write(sources)
+        st.caption(f"📅 Base au {DATE_CORPUS} — {AVERTISSEMENT}")
 
-    st.info(AVERTISSEMENT)
+    # 3. Mémoriser la réponse (avec ses sources) pour les ré-affichages
+    st.session_state.messages.append(
+        {"role": "assistant", "content": reponse, "sources": sources}
+    )
