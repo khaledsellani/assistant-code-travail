@@ -28,8 +28,7 @@ print("  Posez votre question, ou tapez 'quitter' pour sortir.")
 print("=" * 60)
 
 while True:
-    question = input("\n❓ Votre question : ").strip()
-
+    question = input("\n❓ Votre question ('quitter' pour sortir) : ").strip()
     if question.lower() in ("quitter", "exit", "q"):
         print("Au revoir !")
         break

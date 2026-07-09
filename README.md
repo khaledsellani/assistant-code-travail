@@ -120,6 +120,8 @@ La base est rechargée depuis le disque sans réindexation.
 Scripts de vérification : `controle_qualite.py` (relecture du corpus),
 `evaluer_retrieval.py` (5 questions de référence, score 5/5).
 
+L'assistant pose une boucle de questions-réponses. Commandes de
+sortie : `quitter`, `exit` ou `q`. Une entrée vide redemande la question.
 
 ## Amélioration (jalon 6) : score de confiance
 
