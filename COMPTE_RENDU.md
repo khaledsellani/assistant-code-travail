@@ -1,12 +1,10 @@
 # Compte rendu — Assistant Code du travail
 
 ## Difficultés rencontrées
-- Prise en main du workflow Git en solo (branches, PR auto-relues)
 - Volume de la base LEGI (archive >1 Go, 1,5 M de fichiers) : résolu
   par une extraction en flux filtrée sur l'identifiant du Code du travail
 - Lecture de la structure XML LEGI (versions multiples d'un même
   article) : résolu par le filtre ETAT=VIGUEUR
-- [ajoutez ce qui VOUS a marqué : le venv, les erreurs de syntaxe...]
 
 ## Décisions de conception
 - Chunk = un article, préfixé thème/section (Q1), validé par un jeu
@@ -16,5 +14,8 @@
   le code, pas par le modèle
 
 ## Avec plus de temps
-- [choisissez : historique de conversation, recherche hybride sur les
-  numéros d'articles, interface web...]
+- Historique de conversation envoyé au LLM : l'interface web affiche
+  les échanges précédents mais chaque question reste traitée
+  indépendamment. Une question de suivi ("et pour un CDD ?") n'est
+  donc pas comprise. Il faudrait inclure les derniers échanges dans
+  le prompt.
