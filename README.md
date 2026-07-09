@@ -119,3 +119,14 @@ python assistant.py
 La base est rechargée depuis le disque sans réindexation.
 Scripts de vérification : `controle_qualite.py` (relecture du corpus),
 `evaluer_retrieval.py` (5 questions de référence, score 5/5).
+
+
+## Amélioration (jalon 6) : score de confiance
+
+Le seuil a été calibré en comparant la distance du meilleur chunk sur
+5 questions du domaine (7,5 à 17,4) et 5 questions hors domaine (18,6
+à 33,5). Seuil retenu : 18,0. Une question du domaine formulée très
+familièrement ("Le CDD peut-il être renouvelé ?", 17,4) montre que la
+frontière est étroite : l'alerte n'est donc pas bloquante, elle
+signale seulement une confiance faible. Les distances sont affichées
+à côté de chaque article source.
