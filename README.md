@@ -123,6 +123,10 @@ Scripts de vérification : `controle_qualite.py` (relecture du corpus),
 L'assistant pose une boucle de questions-réponses. Commandes de
 sortie : `quitter`, `exit` ou `q`. Une entrée vide redemande la question.
 
+Interface web (bonus) : `streamlit run app.py` — mêmes fonctionnalités
+que la CLI (citations, score de confiance, avertissement), via le même
+pipeline (`repondre.py`).
+
 ## Amélioration (jalon 6) : score de confiance
 
 Le seuil a été calibré en comparant la distance du meilleur chunk sur
